@@ -15,11 +15,12 @@ img_info = pd.read_csv('./data/img_info.csv')
 
 # 이미지 유사도
 class ImgSimilarity:
-    def __init__(self, df):
+    def __init__(self, df, count):
         # 키워드 유사도로 추출 한 user가 선택한 장소
         # 이 부분 데이터 다 합칠 때 id 값으로 변경
+        self.count=count
         self.place_df=df["place_id"].values
-        self.place=self.place_df[0:5]
+        self.place=self.place_df[0:count]
         self.place_idx=[]
         place_id=[]
         for idx,row  in img_info.iterrows():
@@ -36,7 +37,7 @@ class ImgSimilarity:
             cnt+=1
 
         self.results=[]
-        for i in range(1,6):
+        for i in range(1,self.count+1):
             self.results.append(self.user_place.sort_values(f'cosine_sim_{i}', ascending=False)[['name', 'file', 'id','idx', f'cosine_sim_{i}']][:5])
 
     def make_user_place_df(self):
