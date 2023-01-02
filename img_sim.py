@@ -29,16 +29,35 @@ class ImgSimilarity:
                     place_id.append(row['id'])
                     self.place_idx.append(idx)
 
-    def make_cosine_sim(self):
+        cnt=count
+        while True:
+            if len(self.place_idx)==count:
+                break
+            else:
+                add_cnt=count-len(self.place_idx)
+                place_add=self.place_df[count:count+add_cnt]
+                cnt+=1
+                for idx,row  in img_info.iterrows():
+                    if row["id"] in place_add:
+                        if row['id'] not in place_id:
+                            place_id.append(row['id'])
+                            self.place_idx.append(idx)
+
+            if cnt>5:
+                break
+
+
+    def make_cosine_sim(self, area):
         self.user_place=img_info.copy()
         cnt=1
         for i in self.place_idx:
             self.user_place[f'cosine_sim_{cnt}'] = cosine_sim[i]
             cnt+=1
 
+        self.user_place=self.user_place[self.user_place['area'].isin(area)]
         self.results=[]
         for i in range(1,self.count+1):
-            self.results.append(self.user_place.sort_values(f'cosine_sim_{i}', ascending=False)[['name', 'file', 'id','idx', f'cosine_sim_{i}']][:5])
+            self.results.append(self.user_place.sort_values(f'cosine_sim_{i}', ascending=False)[['name', 'file', 'id','idx','area', f'cosine_sim_{i}']][:5])
 
     def make_user_place_df(self):
         # 겹치는 name 제거하고 출력
@@ -59,7 +78,7 @@ class ImgSimilarity:
                 if len(del_index)==0:
                     break
                 result=result.drop(del_index)
-                add_df=self.user_place.sort_values(f'cosine_sim_{cnt}', ascending=False)[['name', 'file', 'id', 'idx', f'cosine_sim_{cnt}']][start:start+len(del_index)]
+                add_df=self.user_place.sort_values(f'cosine_sim_{cnt}', ascending=False)[['name', 'file', 'id', 'idx','area', f'cosine_sim_{cnt}']][start:start+len(del_index)]
                 start=start+len(del_index)
                 result=pd.concat([result,add_df])
             self.results[r_idx]=result

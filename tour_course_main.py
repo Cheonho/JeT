@@ -38,13 +38,20 @@ def tour_course():
     key_word=param['keyword']
     user_id=param['userId']
     tendency_result=param["tendency_result"]
+    area=param["area"]
+    start_day = int(param["start_day"])
+    end_day = int(param["end_day"])
+    start_time = int(param["start_time"])
+    end_time = int(param["end_time"])
 
     # keyword로 유저의 장소 선호도 생성
-    pre_df=KeyWordSimilarit(key_word).re_df()
+    keyword_place_count=KeyWordSimilarit(key_word, area)
+    pre_df=keyword_place_count.re_df()
+    place_count=keyword_place_count.day(start_day, end_day, start_time, end_time)
 
     # img 유사도
-    img_sim=ImgSimilarity(pre_df, 5)
-    img_sim.make_cosine_sim()
+    img_sim=ImgSimilarity(pre_df, place_count)
+    img_sim.make_cosine_sim(area)
     place_list=img_sim.make_user_place_df()
 
     # user 성향에 따라 장소 결정
@@ -74,6 +81,7 @@ def tour_course():
         else:
             course_dict[f"place{i+1}"]=course[i]
 
+    print(course)
     course_df=pd.DataFrame([course_dict])
     course_df.to_sql(name="course", con=engine, if_exists="append", index=False)
 

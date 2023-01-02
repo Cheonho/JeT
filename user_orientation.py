@@ -12,7 +12,6 @@ import MySQLdb
 from img_sim import ImgSimilarity
 from key_word_sim import KeyWordSimilarit
 import TSP
-df=pd.read_csv("./data/visit_jeju_merge_data_v13.csv", encoding='cp949')
 
 # user 성향을 통한 코스 추천
 
@@ -158,7 +157,8 @@ class UserOrientation:
 if __name__ == "__main__":
     # row 생략 없이 출력
     test_user=["0", "1", "2"]
-    pre_df=KeyWordSimilarit(test_user).re_df()
+    area=['제주시']
+    pre_df=KeyWordSimilarit(test_user, area).re_df()
     a=ImgSimilarity(pre_df, 7)
     a.make_cosine_sim()
     test=a.make_user_place_df()
