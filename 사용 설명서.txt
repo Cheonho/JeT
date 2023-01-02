@@ -1,0 +1,16 @@
+바꿔야 하는 부분
+tour_course_main.py
+	- 19번째 줄 db = pymysql.connect(host="localhost", port=3306, user="아이디", passwd="비번", db="db명", charset="utf8")
+	- 22번째 줄 engine=create_engine("mysql://root:mysql@127.0.0.1/db명", encoding="utf-8")
+	- 87번째 줄 course_df.to_sql(name="코스 table 명", con=engine, if_exists="append", index=False)
+
+user_orientation.py
+	- 27번쨰 줄 db = pymysql.connect(host="localhost", port=3306, user="user명", passwd="비번", db="db명", charset="utf8")
+	- 30번쨰 줄 self.engine=create_engine("mysql://root:mysql@127.0.0.1/db명", encoding="utf-8")
+	- 31번쨰 줄 self.main_df = pd.read_sql_query("select * from jejudata들어가있는table명;", db)
+
+
+실행
+visual code에서 다운 받은 폴더로 가서
+python tour_course_main.py
+

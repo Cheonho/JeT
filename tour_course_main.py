@@ -37,12 +37,12 @@ def tour_course():
     param = request.get_json()
     key_word=param['keyword']
     user_id=param['userId']
-    tendency_result=param["tendency_result"]
+    tendency_result=param["currentStep"]
     area=param["area"]
-    start_day = int(param["start_day"])
-    end_day = int(param["end_day"])
-    start_time = int(param["start_time"])
-    end_time = int(param["end_time"])
+    start_day = int(param["date_start"].replace("-", ""))
+    end_day = int(param["date_end"].replace("-", ""))
+    start_time = int(param["duration_start"].split(":")[0])
+    end_time = int(param["duration_end"].split(":")[0])
 
     # keyword로 유저의 장소 선호도 생성
     keyword_place_count=KeyWordSimilarit(key_word, area)
@@ -82,6 +82,7 @@ def tour_course():
             course_dict[f"place{i+1}"]=course[i]
 
     print(course)
+    # db에 넣는 부분
     course_df=pd.DataFrame([course_dict])
     course_df.to_sql(name="course", con=engine, if_exists="append", index=False)
 
