@@ -1,0 +1,13 @@
+keyword 0~4 까지
+tendency_result 0~3 까지
+
+{
+    "keyword":["0","1"],
+    "userId":"asd",
+    "tendency_result":2,
+    "area":["제주시", "서귀포시 서부", "제주시 동부"],
+    "start_day" : "230102",
+    "end_day" : "230105",
+    "start_time" : "9",
+    "end_time" : "18"
+}
