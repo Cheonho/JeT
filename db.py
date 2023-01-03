@@ -9,7 +9,13 @@ class Db:
         self.cursor=self.db.cursor()
 
     def create_engine():
-        return create_engine("mysql://root:mysql@127.0.0.1/JeT", encoding="utf-8")
+        return create_engine("mysql://root:mysql@localhost/JeT", encoding="utf-8")
     
-    def db_close(self):
+    def close(self):
         self.db.close()
+
+    def connect(self, sql):
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        self.db.close()
+        return str(result)

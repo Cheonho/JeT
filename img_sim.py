@@ -43,8 +43,9 @@ class ImgSimilarity:
                             place_id.append(row['id'])
                             self.place_idx.append(idx)
 
-            if cnt>5:
+            if cnt>10:
                 break
+        print(self.place_idx)
 
 
     def make_cosine_sim(self, area):
@@ -61,8 +62,6 @@ class ImgSimilarity:
 
     def make_user_place_df(self):
         # 겹치는 name 제거하고 출력
-        # 이름에 '+' -> '/'로 바꿔주는 작업 아직 안함
-        # test 해봐야 할듯
         cnt=0
         for r_idx, result in enumerate(self.results):
             cnt+=1
@@ -86,6 +85,7 @@ class ImgSimilarity:
         result_id_list=[]
         for i in self.results:
             result_id_list.append(i['id'].values.tolist())
+        print(result_id_list)
         return result_id_list
 
     def place_img_mat(self, result_df):

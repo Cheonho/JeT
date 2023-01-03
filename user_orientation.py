@@ -15,19 +15,19 @@ class UserOrientation:
     # 2. 인기순위
     # 3. 사람들이 잘 안가는 곳
 
-    def __init__(self, place_list: list, engine):
+    def __init__(self, place_list: list, engine, area):
         self.main_df = pd.read_sql_query("select * from jejudata;", engine)
-
         self.place_list=place_list
-            
+        
     def user_tendency(self, column_name, NOP):
         recommendation_list = []
         for place in self.place_list:
-            tmp_num = self.main_df[self.main_df['JejuDataNo'].isin(place)][column_name].values
-            tmp_place = self.main_df[self.main_df[column_name] == NOP(tmp_num)].index.to_list()
-            tmp_place_id = self.main_df['JejuDataNo'].values[tmp_place]
-            recommendation_list.append(tmp_place_id[0])
-        recommendation_list.insert(0, "111111")
+            sub_df=self.main_df[self.main_df['JejuDataNo'].isin(place)]
+            tmp_num = sub_df[column_name].values
+            tmp_place = sub_df[sub_df[column_name] == NOP(tmp_num)]['JejuDataNo'].to_list()
+            # tmp_place_id = sub_df['JejuDataNo'].values[tmp_place]
+            recommendation_list.append(tmp_place[0])
+        recommendation_list.insert(0, 111111)
         return recommendation_list
 
     # 0. 유사도 높은 순
@@ -105,12 +105,27 @@ class UserOrientation:
             if len(path) == len(self.place_list) + 1:
                 break
 
-        path.append(0) 
-        final_recommendation_list=[]
+        #path.append(0)
+
+        tmp_recommendation_list=[]
         for i in range(len(path)):
-            final_recommendation_list.append(tsp.tmp_places[path[i]])
-        final_length = round(sum_length)
-        return final_recommendation_list[1:-1], final_length
+            tmp_recommendation_list.append(tsp.tmp_places[path[i]])
+
+        tsp=TSP.TSPAlgorithm(tmp_recommendation_list)
+        # 간선의 정보
+        for i in range(len(tmp_recommendation_list)):
+            for j in range(len(tmp_recommendation_list)):
+                if i == j:
+                    pass
+                else:
+                    start = (self.main_df[self.main_df['JejuDataNo'] == int(tmp_recommendation_list[i])]['Latitude'].values, self.main_df[self.main_df['JejuDataNo'] == int(tmp_recommendation_list[i])]['Longitude'].values)
+                    goal = (self.main_df[self.main_df['JejuDataNo'] == int(tmp_recommendation_list[j])]['Latitude'].values, self.main_df[self.main_df['JejuDataNo'] == int(tmp_recommendation_list[j])]['Longitude'].values)
+                    w = haversine(start, goal)
+                    tsp.W[i+1][j+1] = round(w,2)
+        
+        opttour=tsp.func()
+        
+        return self.result(opttour, tmp_recommendation_list, tsp)
 
 
     # 2. 인기순위 - po=popilarity
