@@ -1,12 +1,5 @@
 import pandas as pd
-import heapq
-from copy import deepcopy
 from haversine import haversine
-import numpy as np
-from sqlalchemy import create_engine
-import pymysql
-pymysql.install_as_MySQLdb()
-import MySQLdb
 
 # 내가 만든 파일 -> test 진행 위해 import
 from img_sim import ImgSimilarity
@@ -22,13 +15,8 @@ class UserOrientation:
     # 2. 인기순위
     # 3. 사람들이 잘 안가는 곳
 
-    def __init__(self, place_list: list):
-        # db 연결
-        db = pymysql.connect(host="localhost", port=3306, user="root", passwd="mysql", db="JeT", charset="utf8")
-        self.cursor=db.cursor()
-
-        self.engine=create_engine("mysql://root:mysql@127.0.0.1/JeT", encoding="utf-8")
-        self.main_df = pd.read_sql_query("select * from jejudata;", db)
+    def __init__(self, place_list: list, engine):
+        self.main_df = pd.read_sql_query("select * from jejudata;", engine)
 
         self.place_list=place_list
             

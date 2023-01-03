@@ -1,38 +1,27 @@
-from flask import Flask, request, jsonify, Response
-from haversine import haversine
-from sqlalchemy import create_engine
-import pymysql
-pymysql.install_as_MySQLdb()
-import MySQLdb
+from flask import Flask, request, jsonify
 import pandas as pd
 import numpy as np
+from flask_cors import CORS
 # MySQLdb는 pymysql.install_as_MySQLdb() 이런식으로 install 해줘야 한다
 
 # 내가 만든 파일
 from img_sim import ImgSimilarity
 from key_word_sim import KeyWordSimilarit
 from user_orientation import UserOrientation
-# db 완료 후 db에서 가져오는 코드로 바꿔주기
-# df=pd.read_csv("./data/visit_jeju_merge_data_v13.csv", encoding='cp949')
-
-# db 연결
-db = pymysql.connect(host="localhost", port=3306, user="root", passwd="mysql", db="JeT", charset="utf8")
-cursor=db.cursor()
-
-engine=create_engine("mysql://root:mysql@127.0.0.1/JeT", encoding="utf-8")
+from db import Db
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/') #test api
 def index():
     return 'ok'
 
-# @app.route('/echo_call/<param>') #get echo api
-# def get_echo_call(param):
-#     return jsonify({"param": param})
-
 @app.route('/tour_course', methods=['POST']) #post echo api
 def tour_course():
+    # db연결
+    db=Db
+    engine=db.create_engine()
     # post방식으로 넘어온 json data 읽어 들임
     param = request.get_json()
     key_word=param['keyword']
@@ -61,7 +50,7 @@ def tour_course():
     # 2. 인기순위
     # 3. 사람들이 잘 안가는 곳
     
-    user=UserOrientation(place_list)
+    user=UserOrientation(place_list, engine)
     if tendency_result==0:
         course, distance=user.high_similarity()
     elif tendency_result==1:
@@ -85,6 +74,8 @@ def tour_course():
     # db에 넣는 부분
     course_df=pd.DataFrame([course_dict])
     course_df.to_sql(name="course", con=engine, if_exists="append", index=False)
+
+    # db.db_close()
 
     response={
         "message":"ok"
