@@ -45,10 +45,10 @@ class ImgSimilarity:
 
             if cnt>10:
                 break
-        print(self.place_idx)
+        print(f"asd: {self.place_idx}")
 
 
-    def make_cosine_sim(self, area):
+    def make_cosine_sim(self, area, tendency_result):
         self.user_place=img_info.copy()
         cnt=1
         for i in self.place_idx:
@@ -56,9 +56,11 @@ class ImgSimilarity:
             cnt+=1
 
         self.user_place=self.user_place[self.user_place['area'].isin(area)]
+        if tendency_result==2:
+            self.user_place=self.user_place.sort_values('like_num', ascending=False)[:200]
         self.results=[]
         for i in range(1,self.count+1):
-            self.results.append(self.user_place.sort_values(f'cosine_sim_{i}', ascending=False)[['name', 'file', 'id','idx','area', f'cosine_sim_{i}']][:5])
+            self.results.append(self.user_place.sort_values(f'cosine_sim_{i}', ascending=False)[['name', 'file', 'id','idx','area', 'like_num', f'cosine_sim_{i}']][:5])
 
     def make_user_place_df(self):
         # 겹치는 name 제거하고 출력
@@ -77,7 +79,7 @@ class ImgSimilarity:
                 if len(del_index)==0:
                     break
                 result=result.drop(del_index)
-                add_df=self.user_place.sort_values(f'cosine_sim_{cnt}', ascending=False)[['name', 'file', 'id', 'idx','area', f'cosine_sim_{cnt}']][start:start+len(del_index)]
+                add_df=self.user_place.sort_values(f'cosine_sim_{cnt}', ascending=False)[['name', 'file', 'id', 'idx','area', 'like_num', f'cosine_sim_{cnt}']][start:start+len(del_index)]
                 start=start+len(del_index)
                 result=pd.concat([result,add_df])
             self.results[r_idx]=result

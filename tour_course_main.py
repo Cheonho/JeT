@@ -36,13 +36,13 @@ def tour_course():
     end_time = int(param["duration_end"].split(":")[0])
 
     # keyword로 유저의 장소 선호도 생성
-    keyword_place_count=KeyWordSimilarit(key_word, area)
+    keyword_place_count=KeyWordSimilarit(key_word, area, tendency_result)
     pre_df=keyword_place_count.re_df()
     place_count=keyword_place_count.day(start_day, end_day, start_time, end_time)
 
     # img 유사도
     img_sim=ImgSimilarity(pre_df, int(place_count))
-    img_sim.make_cosine_sim(area)
+    img_sim.make_cosine_sim(area, tendency_result)
     place_list=img_sim.make_user_place_df()
 
     # user 성향에 따라 장소 결정
@@ -51,8 +51,7 @@ def tour_course():
     # 1. 최단 거리
     # 2. 인기순위
     # 3. 사람들이 잘 안가는 곳
-    
-    user=UserOrientation(place_list, engine, area)
+    user=UserOrientation(place_list, engine)
     if tendency_result==0:
         course, distance=user.high_similarity()
     elif tendency_result==1:

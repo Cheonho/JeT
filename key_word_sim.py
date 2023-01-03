@@ -7,9 +7,12 @@ place_df=pd.read_csv('./data/normalized_place_matrix.csv')
 # place_df_drop=place_df.drop(['place_name','total_count','place_id'], axis=1)
 
 class KeyWordSimilarit:
-    def __init__(self, keyword: list, area):
+    def __init__(self, keyword: list, area, tendency_result):
+        if tendency_result==2:
+            global place_df
+            place_df=place_df.sort_values('like_num', ascending=False)[:200]
         self.place_df_area=place_df[place_df['area'].isin(area)]
-        place_df_drop=self.place_df_area.drop(['place_name','total_count','place_id', 'area'], axis=1)
+        place_df_drop=self.place_df_area.drop(['place_name','total_count','place_id', 'area', 'like_num'], axis=1)
         self.user=[0.0 for i in range(5)]
         for idx, val in enumerate(place_df_drop.columns):
             if val in keyword:

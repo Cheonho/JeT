@@ -15,7 +15,7 @@ class UserOrientation:
     # 2. 인기순위
     # 3. 사람들이 잘 안가는 곳
 
-    def __init__(self, place_list: list, engine, area):
+    def __init__(self, place_list: list, engine):
         self.main_df = pd.read_sql_query("select * from jejudata;", engine)
         self.place_list=place_list
         
@@ -26,7 +26,27 @@ class UserOrientation:
             tmp_num = sub_df[column_name].values
             tmp_place = sub_df[sub_df[column_name] == NOP(tmp_num)]['JejuDataNo'].to_list()
             # tmp_place_id = sub_df['JejuDataNo'].values[tmp_place]
-            recommendation_list.append(tmp_place[0])
+
+            #없으면 추가
+            cnt=0
+            while True:
+                if tmp_place[0] in recommendation_list:
+                    try:
+                        place.remove(tmp_place[0])
+                    except:
+                        cnt+=1
+                        pass
+                    if len(place)==0:
+                        break
+                    sub_df=self.main_df[self.main_df['JejuDataNo'].isin(place)]
+                    tmp_num = sub_df[column_name].values
+                    tmp_place = sub_df[sub_df[column_name] == NOP(tmp_num)]['JejuDataNo'].to_list()
+                    if cnt>10:
+                        break
+                else:
+                    recommendation_list.append(tmp_place[0])
+                    break
+
         recommendation_list.insert(0, 111111)
         return recommendation_list
 
@@ -132,7 +152,7 @@ class UserOrientation:
     # 3. 사람들이 잘 안가는 곳
     def popularity_ranking(self, po):
         if po=="popularity":
-            tmp_recommendation_list = self.user_tendency('lookup_num', max)
+            tmp_recommendation_list = self.user_tendency('like_num', max)
         else:
             tmp_recommendation_list = self.user_tendency('time_sum', min)
         tsp=TSP.TSPAlgorithm(tmp_recommendation_list)
